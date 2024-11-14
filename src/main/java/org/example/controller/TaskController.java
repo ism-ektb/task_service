@@ -2,6 +2,9 @@ package org.example.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.example.dto.NewTaskDto;
+import org.example.dto.TaskDto;
+import org.example.dto.UpdateTaskDto;
 import org.example.model.Task;
 import org.example.service.TaskService;
 import org.springframework.validation.annotation.Validated;
@@ -21,39 +24,32 @@ public class TaskController {
     private TaskService taskService;
 
     @PostMapping
-    public Task createTask(@Validated @RequestBody Task task) {
+    public TaskDto createTask(@Validated @RequestBody NewTaskDto task) {
         return taskService.createTask(task);
     }
 
     @PatchMapping(path = "/{id}")
-    public Task updateTask(@PathVariable Long id, @Validated @RequestBody Task task) {
-        return taskService.updateTask(id, task);
+    public TaskDto updateTask(@RequestHeader("X-Task-User-Id") Long userId, @PathVariable Long id, @Validated @RequestBody UpdateTaskDto task) {
+        return taskService.updateTask(userId, id, task);
     }
 
     @GetMapping(path = "/{id}")
-    public Task getTask(@PathVariable long id) {
+    public TaskDto getTask(@PathVariable long id) {
         return taskService.getTask(id);
     }
 
     @GetMapping
-    public List<Task> getTasks() {
-        return taskService.getTasks();
+    public List<TaskDto> getTasks(@RequestParam int page, @RequestParam int size,
+                                  @RequestParam Long eventId, @RequestParam Long assigneeId, @RequestParam Long authorId) {
+
+        return taskService.getTasks(page,size,eventId, assigneeId, authorId);
     }
 
     @DeleteMapping(path = "/{id}")
-    public void deleteTask(@PathVariable long id) {
-        taskService.delete(id);
+    public void deleteTask(@RequestHeader("X-Task-User-Id") Long userId, @PathVariable long id) {
+        taskService.delete(userId, id);
     }
 }
 
 
-/*
-POST /tasks - создание задачи
 
-PATCH /tasks/{id} - обновление задачи по id (проверка по header - обновлять могут только автор или исполнитель задачи, нельзя обновить createdDateTime и authorId)
-
-GET /tasks/{id} - получение задачи по id
-
-GET /tasks?page={page}&size={size}&eventId={eventId}&assignTo={assigneeId}&authorId={authorId} - получение задач с пагинацией и необязательными фильтрами по id события, id исполнителя и id автора
-
-DELETE /tasks/{id} - удаление задачи по id (проверка по header - удалить может только автор)*/
