@@ -17,7 +17,6 @@ import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 @RestController
 @RequestMapping(path = "/tasks")
 @AllArgsConstructor
-@NoArgsConstructor
 @Validated
 public class TaskController {
 

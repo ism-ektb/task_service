@@ -22,15 +22,14 @@ import java.util.stream.Collectors;
 @Service
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class TaskService {
 
     private TaskRepository taskRepository;
     private ModelMapper mapper;
-    private LocalDateTime time = LocalDateTime.now();
 
 
     public TaskDto createTask(NewTaskDto newTask) {
+        LocalDateTime time = LocalDateTime.now();
         Task task = Task.builder()
                 .title(newTask.getTitle())
                 .description(newTask.getDescription())
