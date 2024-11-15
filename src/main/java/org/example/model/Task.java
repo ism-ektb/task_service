@@ -1,38 +1,39 @@
 package org.example.model;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+
 import java.time.LocalDateTime;
 
+@Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @Table(name = "tasks")
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private Long id;
-    @Column
+    @Column(name = "title")
     private String title;
-    @Column
+    @Column(name = "description")
     private String description;
-    @Column
+    @Column(name = "created")
     private LocalDateTime createdDateTime;
-    @Column
+    @Column(name = "deadline")
     private LocalDateTime deadline;
-    @Column
+    @Column(name = "status")
     private String status;
-    @Column
+    @Column(name = "assignee_id")
     private Long assigneeId;
-    @Column
+    @Column(name = "author_id")
     private Long authorId;
-    @Column
+    @Column(name = "event_id")
     private Long eventId;
 }

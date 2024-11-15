@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Data
@@ -62,8 +63,10 @@ public class TaskService {
 
     public List<TaskDto> getTasks(int page,int size, Long eventId, Long assigneeId, Long authorId) {
         Pageable paged = PageRequest.of(page, size);
-
-        return taskRepository.findAll();
+//        QTask qTask = QTask.task;
+        return taskRepository.findAll().stream().
+                map(x->mapper.map(x, TaskDto.class))
+                .collect(Collectors.toList());
     }
 
     public void delete(Long userId, long id) {
