@@ -1,0 +1,48 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-tasks
+      author: shata
+      changes:
+        - createTable:
+            tableName: tasks
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: varchar(200)
+              - column:
+                  name: createdDateTime
+                  type: timestamp without timezone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deadline
+                  type: timestamp without timezone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(10)
+              - column:
+                  name: assigneeId
+                  type: bigint
+              - column:
+                  name: authorId
+                  type: bigint
+              - column:
+                  name: eventId
+                  type: bigint
+
+
+

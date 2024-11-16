@@ -24,6 +24,7 @@ public class TaskController {
 
     @PostMapping
     public TaskDto createTask(@Validated @RequestBody NewTaskDto task) {
+
         return taskService.createTask(task);
     }
 
