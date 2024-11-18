@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.example.dto.NewTaskDto;
@@ -39,10 +40,10 @@ public class TaskController {
     }
 
     @GetMapping
-    public List<TaskDto> getTasks(@RequestParam int page, @RequestParam int size,
-                                  @RequestParam Long eventId, @RequestParam Long assigneeId, @RequestParam Long authorId) {
+    public List<TaskDto> getTasks(@RequestParam(defaultValue = "0", name = "page") int page, @RequestParam(defaultValue = "10", name = "size") int size,
+                                  @RequestParam @Nullable Long eventId, @RequestParam  @Nullable Long assignTo, @RequestParam  @Nullable Long authorId) {
 
-        return taskService.getTasks(page,size,eventId, assigneeId, authorId);
+        return taskService.getTasks(page,size,eventId, assignTo, authorId);
     }
 
     @DeleteMapping(path = "/{id}")

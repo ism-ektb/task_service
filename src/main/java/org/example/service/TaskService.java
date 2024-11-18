@@ -11,6 +11,7 @@ import org.example.exeptions.StorageException;
 import org.modelmapper.ModelMapper;
 import org.example.model.Task;
 import org.example.repository.TaskRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -62,8 +63,8 @@ public class TaskService {
 
     public List<TaskDto> getTasks(int page,int size, Long eventId, Long assigneeId, Long authorId) {
         Pageable paged = PageRequest.of(page, size);
-//        QTask qTask = QTask.task;
-        return taskRepository.findAll().stream().
+        Page<Task> tasks = taskRepository.findByFilters(assigneeId, eventId, authorId,paged);
+        return tasks.stream().
                 map(x->mapper.map(x, TaskDto.class))
                 .collect(Collectors.toList());
     }
