@@ -1,3 +1,5 @@
 databaseChangeLog:
   - include:
       file: db/changelog/changeset/create-tasks-table.yaml
+  - include:
+      file: db/changelog/changeset/change-tasks-table.yaml

@@ -22,7 +22,7 @@ databaseChangeLog:
                   name: description
                   type: varchar(200)
               - column:
-                  name: createdDateTime
+                  name: created
                   type: timestamp without timezone
                   constraints:
                     nullable: false
@@ -35,10 +35,10 @@ databaseChangeLog:
                   name: status
                   type: varchar(10)
               - column:
-                  name: assigneeId
+                  name: assignee_id
                   type: bigint
               - column:
-                  name: authorId
+                  name: author_id
                   type: bigint
               - column:
                   name: eventId
