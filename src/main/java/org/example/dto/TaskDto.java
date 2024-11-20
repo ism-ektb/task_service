@@ -1,5 +1,6 @@
 package org.example.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;

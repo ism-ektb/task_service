@@ -2,18 +2,14 @@ package org.example.controller;
 
 import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.example.dto.NewTaskDto;
 import org.example.dto.TaskDto;
 import org.example.dto.UpdateTaskDto;
-import org.example.model.Task;
-import org.example.service.TaskService;
+import org.example.service.TaskServiceImpl;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @RestController
 @RequestMapping(path = "/tasks")
@@ -21,7 +17,7 @@ import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 @Validated
 public class TaskController {
 
-    private TaskService taskService;
+    private TaskServiceImpl taskService;
 
     @PostMapping
     public TaskDto createTask(@Validated @RequestBody NewTaskDto task) {
