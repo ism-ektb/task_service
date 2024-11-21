@@ -1,14 +1,13 @@
 package org.example.service;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.example.dto.NewTaskDto;
 import org.example.dto.TaskDto;
 import org.example.dto.UpdateTaskDto;
 import org.example.exeptions.ConflictException;
 import org.example.exeptions.StorageException;
-import org.modelmapper.ModelMapper;
+import org.example.mapper.TaskListMapper;
+import org.example.mapper.TaskMapper;
 import org.example.model.Task;
 import org.example.repository.TaskRepository;
 import org.springframework.data.domain.Page;
@@ -18,15 +17,14 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
-@Data
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TaskService {
 
-    private TaskRepository taskRepository;
-    private ModelMapper mapper;
+    private final TaskRepository taskRepository;
+    private final TaskMapper mapper;
+    private final TaskListMapper listMapper;
 
 
     public TaskDto createTask(NewTaskDto newTask) {
@@ -41,7 +39,7 @@ public class TaskService {
                 .authorId(newTask.getAuthorId())
                 .eventId(newTask.getEventId())
                 .build();
-        return mapper.map(taskRepository.save(task), TaskDto.class);
+        return mapper.modelToDto(taskRepository.save(task));
     }
 
     public TaskDto updateTask(Long userId, Long id, UpdateTaskDto updateTask) {
@@ -53,20 +51,18 @@ public class TaskService {
         task.setDescription(updateTask.getDescription());
         task.setDeadline(updateTask.getDeadline());
         task.setEventId(updateTask.getEventId());
-        return mapper.map(taskRepository.save(task), TaskDto.class);
+        return mapper.modelToDto(taskRepository.save(task));
     }
 
     public TaskDto getTask(long id) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new StorageException("Событие не найдено или недоступно"));
-        return mapper.map(task, TaskDto.class);
+        return mapper.modelToDto(task);
     }
 
     public List<TaskDto> getTasks(int page,int size, Long eventId, Long assigneeId, Long authorId) {
         Pageable paged = PageRequest.of(page, size);
         Page<Task> tasks = taskRepository.findByFilters(assigneeId, eventId, authorId,paged);
-        return tasks.stream().
-                map(x->mapper.map(x, TaskDto.class))
-                .collect(Collectors.toList());
+        return listMapper.modelsToDtos(tasks.toList());
     }
 
     public void delete(Long userId, long id) {
