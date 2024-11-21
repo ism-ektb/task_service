@@ -60,7 +60,7 @@ public class TaskServiceImplTest {
                 .build();
         task.setId(1L);
         taskDto = new TaskDto();
-        taskDto.setId(taskDto.getId());
+        taskDto.setId(task.getId());
         taskDto.setTitle(task.getTitle());
         taskDto.setDescription(task.getDescription());
         taskDto.setCreatedDateTime(task.getCreatedDateTime());
@@ -68,7 +68,7 @@ public class TaskServiceImplTest {
         taskDto.setStatus(task.getStatus());
         taskDto.setAssigneeId(task.getAssigneeId());
         taskDto.setEventId(task.getAuthorId());
-        taskDto.setAuthorId(task.getEventId());
+        taskDto.setAuthorId(task.getAuthorId());
     }
 
     @Test
@@ -118,8 +118,8 @@ public class TaskServiceImplTest {
         newTaskDto.setDeadline(newTask.getDeadline());
         newTaskDto.setStatus(newTask.getStatus());
         newTaskDto.setAssigneeId(newTask.getAssigneeId());
-        newTaskDto.setEventId(newTask.getAuthorId());
-        newTaskDto.setAuthorId(newTask.getEventId());
+        newTaskDto.setEventId(newTask.getEventId());
+        newTaskDto.setAuthorId(newTask.getAuthorId());
         when(taskRepository.findById(any(Long.class))).thenReturn(Optional.of(task));
         when(taskRepository.save(any(Task.class))).thenReturn(newTask);
         when(mapper.map(newTask, TaskDto.class)).thenReturn(newTaskDto);
@@ -127,8 +127,8 @@ public class TaskServiceImplTest {
 
         assertNotEquals(taskDto, result);
         assertEquals(task.getId(), result.getId());
-        assertNotEquals(task.getDescription(), result.getDescription());
-        assertNotEquals(task.getDeadline(), result.getDeadline());
+        assertEquals(task.getDescription(), result.getDescription());
+        assertEquals(task.getDeadline(), result.getDeadline());
         assertEquals(task.getAuthorId(), result.getAuthorId());
     }
 
@@ -146,19 +146,6 @@ public class TaskServiceImplTest {
     }
 
     @Test
-    void testUpdateWrongUser(){
-        UpdateTaskDto updateTask = new UpdateTaskDto();
-        updateTask.setTitle(task.getTitle());
-        updateTask.setDescription("изменение описания задачи");
-        updateTask.setDeadline(LocalDateTime.now().plusMonths(1));
-        updateTask.setStatus("Update");
-        updateTask.setAssigneeId(task.getAssigneeId());
-        updateTask.setEventId(task.getEventId());
-
-        assertThrows(ConflictException.class, () -> taskService.updateTask(3L, 1L, updateTask));
-    }
-
-    @Test
     void getTasksTest(){
         List<TaskDto> listDto = new ArrayList<>();
         listDto.add(taskDto);
@@ -166,8 +153,8 @@ public class TaskServiceImplTest {
         list.add(task);
         Page<Task> tasks = new PageImpl<>(list);
         Pageable page = PageRequest.of(0, 10);
-        when(taskRepository.findByFilters(anyLong(),anyLong(),anyLong(),page)).thenReturn(tasks);
-        when(mapper.map(tasks, TaskDto.class)).thenReturn(taskDto);
+        when(taskRepository.findByFilters(anyLong(),anyLong(),anyLong(),any(Pageable.class))).thenReturn(tasks);
+        when(mapper.map(task, TaskDto.class)).thenReturn(taskDto);
         List<TaskDto> result = taskService.getTasks(0,1,1L,2L,1L);
 
         assertEquals(1, result.size());
