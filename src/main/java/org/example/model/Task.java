@@ -1,7 +1,9 @@
 package org.example.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.extern.jackson.Jacksonized;
 
 
 import java.time.LocalDateTime;
@@ -22,7 +24,8 @@ public class Task {
     @Column(name = "description")
     private String description;
     @Column(name = "created")
-    private LocalDateTime createdDateTime;
+    @Builder.Default
+    private LocalDateTime createdDateTime = LocalDateTime.now();
     @Column(name = "deadline")
     private LocalDateTime deadline;
     @Column(name = "status")
@@ -33,4 +36,7 @@ public class Task {
     private Long authorId;
     @Column(name = "event_id")
     private Long eventId;
+    @ManyToOne
+    @JoinColumn(name = "epic_id", referencedColumnName = "id")
+    private Epic epic;
 }
