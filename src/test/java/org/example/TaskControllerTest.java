@@ -108,21 +108,21 @@ public class TaskControllerTest {
     void getTasksTest() throws Exception {
         List<TaskDto> tasks = List.of(taskDto);
         when(taskService.getTasks(anyInt(),anyInt(),anyLong(),anyLong(),anyLong())).thenReturn(tasks);
-        mvc.perform(get("/items")
+        mvc.perform(get("/tasks")
                 .accept(MediaType.APPLICATION_JSON)
                 .header("X-Task-User-Id", "1")
-                .param("from", "1")
+                .param("page", "1")
                 .param("size", "2")
                 .param("eventId","1")
                 .param("assignTo","1" )
                 .param("authorId","2")
                 ).andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(taskDto.getId()), Long.class))
-                .andExpect(jsonPath("$.title").value(taskDto.getTitle()))
-                .andExpect(jsonPath("$.description").value(taskDto.getDescription()))
-                .andExpect(jsonPath("$.authorId", is(taskDto.getAuthorId()), Long.class))
-                .andExpect(jsonPath("$.authorId").value(taskDto.getAuthorId()))
-                .andExpect(jsonPath("$.authorId").value(2));
+                .andExpect(jsonPath("$[0].id", is(taskDto.getId()), Long.class))
+                .andExpect(jsonPath("$[0].title").value(taskDto.getTitle()))
+                .andExpect(jsonPath("$[0].description").value(taskDto.getDescription()))
+                .andExpect(jsonPath("$[0].authorId", is(taskDto.getAuthorId()), Long.class))
+                .andExpect(jsonPath("$[0].authorId").value(taskDto.getAuthorId()))
+                .andExpect(jsonPath("$[0].authorId").value(2));
         verify(taskService, times(1)).getTasks(anyInt(),anyInt(),anyLong(),anyLong(),anyLong());
     }
 }
