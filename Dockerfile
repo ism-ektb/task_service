@@ -1,3 +1,3 @@
-  FROM amazoncorretto:17
-    COPY target/*.jar task_service.jar
-    ENTRYPOINT ["java", "-jar", "/task_service.jar"]
+FROM openjdk:22
+COPY target/*.jar app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
