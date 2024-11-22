@@ -1,8 +1,6 @@
 package org.example.service;
 
-import org.example.dto.EpicInDto;
-import org.example.dto.EpicOutDto;
-import org.example.dto.EpicPatchDto;
+import org.example.dto.*;
 import org.example.exeptions.ConflictException;
 import org.example.exeptions.StorageException;
 import org.junit.jupiter.api.MethodOrderer;
@@ -55,7 +53,8 @@ class EpicServiceImplTest {
     void create_noEventId_badResult() {
         EpicInDto epicInDto = EpicInDto.builder().name("Группа")
                 .deadline(LocalDateTime.now().plusDays(1L))
-                .responsibleId(1L).build();
+                .responsibleId(1L)
+                .build();
         assertThrows(DataIntegrityViolationException.class, () -> epicService.create(epicInDto));
 
 
@@ -72,19 +71,39 @@ class EpicServiceImplTest {
     @Order(4)
     void patch_goodResult() {
         EpicPatchDto epicPatchDto = EpicPatchDto.builder().name("Group").build();
-        EpicOutDto epicOutDto = epicService.patch(1L, epicPatchDto);
+        EpicOutLiteDto epicOutDto = epicService.patch(1L, epicPatchDto);
         assertEquals(epicOutDto.getName(), "Group");
     }
 
     @Test
+    @Order(5)
     void addTask() {
+        NewTaskDto newTaskDto = new NewTaskDto("Task", "description", LocalDateTime.now().plusDays(1L), 1L, 1L, 1L);
+    taskService.createTask(newTaskDto);
+    assertThrows(ConflictException.class, () -> epicService.addTask(10L, 1L, 1L));
+    epicService.addTask(1L, 1L, 1L);
+
+    }
+
+
+    @Test
+    @Order(6)
+    void TestAddTask() {
+        EpicOutDto epicOutDto = epicService.findById(1L);
+        assertEquals(epicOutDto.getTasks().get(0).getId(), 1L);
     }
 
     @Test
+    @Order(7)
     void deleteTask() {
+        epicService.deleteTask(1L, 1L, 1L);
+
     }
 
     @Test
+    @Order(8)
     void findById() {
+        EpicOutDto epicOutDto = epicService.findById(1L);
+        assertEquals(epicOutDto.getTasks().isEmpty(), true);
     }
 }

@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "tasks")
+@EqualsAndHashCode(of = {"id"})
+@ToString
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +38,7 @@ public class Task {
     private Long authorId;
     @Column(name = "event_id")
     private Long eventId;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "epic_id", referencedColumnName = "id")
     private Epic epic;
 }

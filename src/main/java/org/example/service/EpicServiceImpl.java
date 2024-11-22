@@ -1,8 +1,10 @@
 package org.example.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.EpicInDto;
 import org.example.dto.EpicOutDto;
+import org.example.dto.EpicOutLiteDto;
 import org.example.dto.EpicPatchDto;
 import org.example.exeptions.ConflictException;
 import org.example.exeptions.StorageException;
@@ -44,10 +46,10 @@ public class EpicServiceImpl implements EpicService{
      * @param epicPatchDto
      */
     @Override
-    public EpicOutDto patch(Long epicId, EpicPatchDto epicPatchDto) {
+    public EpicOutLiteDto patch(Long epicId, EpicPatchDto epicPatchDto) {
         Epic epic = findEpicById(epicId);
         Epic newEpic = patcher.patch(epic, epicPatchDto);
-        return mapper.modelToDto(repository.save(newEpic));
+        return mapper.modelToLiteDto(repository.save(newEpic));
     }
 
     /**
@@ -57,14 +59,16 @@ public class EpicServiceImpl implements EpicService{
      * @param taskId
      */
     @Override
-    public EpicOutDto addTask(Long epicId, Long taskId) {
+    public EpicOutLiteDto addTask(Long userId, Long epicId, Long taskId) {
         Task task = findTaskById(taskId);
         Epic epic = findEpicById(epicId);
+        if (epic.getResponsibleId() != userId) throw new ConflictException(
+                String.format("Пользователь с Id= %s не может добавлять задачи в группу Id= %s", userId, epicId));
         if (epic.getEventId() != task.getEventId()) throw new ConflictException(
                 String.format("Невозможно добавить задачу с ID= %s в группу с ID = %s", taskId, epicId));
         task.setEpic(epic);
         taskRepository.save(task);
-        return mapper.modelToDto(findEpicById(epicId));
+        return mapper.modelToLiteDto(findEpicById(epicId));
     }
 
     /**
@@ -74,14 +78,19 @@ public class EpicServiceImpl implements EpicService{
      * @param taskId
      */
     @Override
-    public EpicOutDto deleteTask(Long epicId, Long taskId) {
+    public EpicOutLiteDto deleteTask(Long userId, Long epicId, Long taskId) {
         Task task = findTaskById(taskId);
         Epic epic = findEpicById(epicId);
-        if (!(epic.getTasks().contains(task))) throw new ConflictException(
-                String.format("задача с ID= %s отсутствует в группе с ID = %s", taskId, epicId));
+        if (epic.getResponsibleId() != userId) throw new ConflictException(
+                String.format("Пользователь с Id= %s не может удалять задачи в группу Id= %s", userId, epicId));
+        if (!(epic.getTasks().contains(task))) {
+            System.out.println(epic.getTasks());
+            throw new ConflictException(
+                    String.format("задача с ID= %s отсутствует в группе с ID = %s", taskId, epicId));
+        }
         task.setEpic(null);
         taskRepository.save(task);
-        return mapper.modelToDto(findEpicById(epicId));
+        return mapper.modelToLiteDto(findEpicById(epicId));
     }
 
     /**

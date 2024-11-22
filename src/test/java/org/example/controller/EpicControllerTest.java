@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.example.dto.EpicInDto;
 import org.example.dto.EpicOutDto;
+import org.example.dto.EpicOutLiteDto;
 import org.example.dto.EpicPatchDto;
 import org.example.service.EpicService;
 import org.example.service.TaskService;
@@ -52,7 +53,7 @@ class EpicControllerTest {
     @SneakyThrows
     void patchEpic_goodResult() {
         EpicPatchDto epic = EpicPatchDto.builder().name("Group").build();
-        when(service.patch(anyLong(), any())).thenReturn(EpicOutDto.builder().build());
+        when(service.patch(anyLong(), any())).thenReturn(EpicOutLiteDto.builder().build());
         mvc.perform(patch("/epics/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .characterEncoding(StandardCharsets.UTF_8)
@@ -62,17 +63,19 @@ class EpicControllerTest {
     @Test
     @SneakyThrows
     void addTasks() {
-        when(service.addTask(anyLong(), any())).thenReturn(EpicOutDto.builder().build());
+        when(service.addTask(anyLong(), anyLong(), any())).thenReturn(EpicOutLiteDto.builder().build());
         mvc.perform(patch("/epics/{id}/addTask", 1L)
-                .param("task", "1")).andExpect(status().isOk());
+                .param("task", "1")
+                .header("X-Task-User-Id", "1")).andExpect(status().isOk());
     }
 
     @Test
     @SneakyThrows
     void deleteTasks() {
-        when(service.deleteTask(anyLong(), anyLong())).thenReturn(EpicOutDto.builder().build());
+        when(service.deleteTask(anyLong(), anyLong(), anyLong())).thenReturn(EpicOutLiteDto.builder().build());
         mvc.perform(patch("/epics/{id}/deleteTask", 1L)
-                .param("task", "1")).andExpect(status().isOk());
+                .param("task", "1")
+                .header("X-Task-User-Id", "1")).andExpect(status().isOk());
     }
 
     @Test

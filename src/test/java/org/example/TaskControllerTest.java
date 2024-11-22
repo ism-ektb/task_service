@@ -59,9 +59,10 @@ public class TaskControllerTest {
     void createTaskTest() throws Exception {
         when(taskService.createTask(any(NewTaskDto.class)))
                 .thenReturn(taskDto);
+        NewTaskDto newTaskDto = new NewTaskDto();
 
         mvc.perform(post("/tasks")
-                        .content(objectMapper.writeValueAsString(taskDto))
+                        .content(objectMapper.writeValueAsString(newTaskDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)

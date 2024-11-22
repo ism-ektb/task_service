@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.dto.EpicInDto;
 import org.example.dto.EpicOutDto;
+import org.example.dto.EpicOutLiteDto;
 import org.example.dto.EpicPatchDto;
 import org.example.service.EpicService;
 import org.springframework.validation.annotation.Validated;
@@ -32,27 +33,29 @@ public class EpicController {
 
     @PatchMapping("/{epicId}")
     @Operation(description = "Редактирование группы")
-    EpicOutDto patchEpic(@PathVariable @Positive long epicId,
+    EpicOutLiteDto patchEpic(@PathVariable @Positive long epicId,
                          @RequestBody @Valid EpicPatchDto epicPatchDto){
-        EpicOutDto epicOutDto = service.patch(epicId, epicPatchDto);
+        EpicOutLiteDto epicOutDto = service.patch(epicId, epicPatchDto);
         log.info("Реквизиты группы с id= {} изменены", epicOutDto.getId());
         return epicOutDto;
     }
 
     @PatchMapping("/{epicId}/addTask")
     @Operation(description = "Добавление задач в эпик")
-    EpicOutDto addTasks(@PathVariable @Positive long epicId,
+    EpicOutLiteDto addTasks(@RequestHeader("X-Task-User-Id") long userId,
+            @PathVariable @Positive long epicId,
                        @RequestParam long task){
-        EpicOutDto epicOutDto = service.addTask(epicId, task);
+        EpicOutLiteDto epicOutDto = service.addTask(userId, epicId, task);
         log.info("в группу с id= {} добавлены задачи", epicOutDto.getId());
         return epicOutDto;
     }
 
     @PatchMapping("/{epicId}/deleteTask")
     @Operation(description = "Удаление задач из эпика")
-    EpicOutDto deleteTasks(@PathVariable @Positive long epicId,
+    EpicOutLiteDto deleteTasks(@RequestHeader("X-Task-User-Id") long userId,
+            @PathVariable @Positive long epicId,
                        @RequestParam long task){
-        EpicOutDto epicOutDto = service.deleteTask(epicId, task);
+        EpicOutLiteDto epicOutDto = service.deleteTask(userId, epicId, task);
         log.info("в группу с id= {} удалены задачи", epicOutDto.getId());
         return epicOutDto;
     }

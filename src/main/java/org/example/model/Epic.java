@@ -18,6 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
+@EqualsAndHashCode(of = {"id"})
 public class Epic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +27,7 @@ public class Epic {
     private String name;
     @Column(name = "responsible_id")
     private Long responsibleId;
-    @OneToMany(mappedBy = "epic")
+    @OneToMany(mappedBy = "epic", cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private List<Task> tasks;
     @Column(name = "event_id")
     private Long eventId;
