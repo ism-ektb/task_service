@@ -1,5 +1,7 @@
 package org.example.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.NewTaskDto;
 import org.example.dto.TaskDto;
@@ -14,10 +16,12 @@ import java.util.List;
 @RequestMapping("/tasks")
 @Validated
 @RequiredArgsConstructor
+@Tag(name = "Контроллер задач")
 public class TaskController {
 
     private final TaskService service;
 
+    @Operation(description = "Создание задачи")
     @PostMapping
     public TaskDto createTask(@Validated @RequestBody NewTaskDto task) {
 

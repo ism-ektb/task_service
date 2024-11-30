@@ -4,7 +4,7 @@
       image: postgres:latest
       container_name: tasks-db
       ports:
-        - "6542:5432"
+        - "6543:5432"
       environment:
         - POSTGRES_DB=tasks
         - POSTGRES_USER=tasks
@@ -15,7 +15,7 @@
       build: .
       container_name: task_service
       ports:
-        - "8080:8080"
+        - "8083:8083"
       depends_on:
         - tasks_db
       environment:
