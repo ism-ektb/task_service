@@ -2,12 +2,15 @@ package org.example.service;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.example.dto.NewTaskDto;
 import org.example.dto.TaskDto;
 import org.example.dto.UpdateTaskDto;
 import org.example.exeptions.ConflictException;
 import org.example.exeptions.StorageException;
-import org.modelmapper.ModelMapper;
+import org.example.mapper.TaskListMapper;
+import org.example.mapper.TaskMapper;
+
 import org.example.model.Task;
 import org.example.repository.TaskRepository;
 import org.springframework.data.domain.Page;
@@ -21,11 +24,12 @@ import java.util.stream.Collectors;
 
 @Service
 @Data
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
 
-    private TaskRepository taskRepository;
-    private ModelMapper mapper;
+    private final TaskRepository taskRepository;
+    private final TaskMapper mapper;
+    private final TaskListMapper listMapper;
 
 
     @Override
@@ -41,7 +45,7 @@ public class TaskServiceImpl implements TaskService {
                 .authorId(newTask.getAuthorId())
                 .eventId(newTask.getEventId())
                 .build();
-        return mapper.map(taskRepository.save(task), TaskDto.class);
+        return mapper.modelToDto(taskRepository.save(task));
     }
 
     @Override
@@ -55,13 +59,13 @@ public class TaskServiceImpl implements TaskService {
         task.setDeadline(updateTask.getDeadline());
         task.setStatus(updateTask.getStatus());
         task.setEventId(updateTask.getEventId());
-        return mapper.map(taskRepository.save(task), TaskDto.class);
+        return mapper.modelToDto(taskRepository.save(task));
     }
 
     @Override
     public TaskDto getTask(long id) {
         Task task = taskRepository.findById(id).orElseThrow(() -> new StorageException("Событие не найдено или недоступно"));
-        return mapper.map(task, TaskDto.class);
+        return mapper.modelToDto(task);
     }
 
     @Override
@@ -71,9 +75,7 @@ public class TaskServiceImpl implements TaskService {
         if(tasks.isEmpty()){
             throw new StorageException("Задачи не найдены");
         }
-        return tasks.stream().
-                map(x->mapper.map(x, TaskDto.class))
-                .collect(Collectors.toList());
+        return listMapper.modelsToDtos(tasks.getContent());
     }
 
     @Override

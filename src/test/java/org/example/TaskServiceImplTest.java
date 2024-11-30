@@ -14,8 +14,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
 
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -32,22 +35,22 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 public class TaskServiceImplTest {
-
+@Autowired
     private TaskServiceImpl taskService;
 
-    @Mock
+    @MockBean
     private TaskRepository taskRepository;
-    @Mock
-    private ModelMapper mapper;
+
+
     private Task task;
     private TaskDto taskDto;
     private LocalDateTime now = LocalDateTime.now();
 
     @BeforeEach
     void setUp() {
-        taskService = new TaskServiceImpl(taskRepository, mapper);
+
         task = Task.builder()
                 .title("задача 1")
                 .description("создание новой задачи")
@@ -67,7 +70,7 @@ public class TaskServiceImplTest {
         taskDto.setDeadline(task.getDeadline());
         taskDto.setStatus(task.getStatus());
         taskDto.setAssigneeId(task.getAssigneeId());
-        taskDto.setEventId(task.getAuthorId());
+        taskDto.setEventId(task.getEventId());
         taskDto.setAuthorId(task.getAuthorId());
     }
 
@@ -81,7 +84,6 @@ public class TaskServiceImplTest {
         newTask.setAuthorId(task.getAuthorId());
         newTask.setEventId(task.getEventId());
         when(taskRepository.save(any(Task.class))).thenReturn(task);
-        when(mapper.map(task, TaskDto.class)).thenReturn(taskDto);
         TaskDto result = taskService.createTask(newTask);
 
         assertEquals(taskDto, result);
@@ -122,7 +124,7 @@ public class TaskServiceImplTest {
         newTaskDto.setAuthorId(newTask.getAuthorId());
         when(taskRepository.findById(any(Long.class))).thenReturn(Optional.of(task));
         when(taskRepository.save(any(Task.class))).thenReturn(newTask);
-        when(mapper.map(newTask, TaskDto.class)).thenReturn(newTaskDto);
+
         TaskDto result = taskService.updateTask(1L,1L, updateTask);
 
         assertNotEquals(taskDto, result);
@@ -154,7 +156,7 @@ public class TaskServiceImplTest {
         Page<Task> tasks = new PageImpl<>(list);
         Pageable page = PageRequest.of(0, 10);
         when(taskRepository.findByFilters(anyLong(),anyLong(),anyLong(),any(Pageable.class))).thenReturn(tasks);
-        when(mapper.map(task, TaskDto.class)).thenReturn(taskDto);
+
         List<TaskDto> result = taskService.getTasks(0,1,1L,2L,1L);
 
         assertEquals(1, result.size());
