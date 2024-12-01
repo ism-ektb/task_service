@@ -1,9 +1,0 @@
-databaseChangeLog:
-  - changeSet:
-      id: change-created
-      author: shata
-      changes:
-        - renameColumn:
-            tableName: tasks
-            newColumnName: created
-            oldColumnName: createdDateTime
