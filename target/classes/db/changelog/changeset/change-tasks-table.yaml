@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: change-names
+      author: shata
+      changes:
+        - renameColumn:
+            tableName: tasks
+            newColumnName: event_id
+            oldColumnName: eventId
