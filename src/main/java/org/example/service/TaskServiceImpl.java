@@ -6,16 +6,21 @@ import lombok.RequiredArgsConstructor;
 import org.example.dto.NewTaskDto;
 import org.example.dto.TaskDto;
 import org.example.dto.UpdateTaskDto;
+import org.example.dto.external.EventDto;
 import org.example.exeptions.ConflictException;
 import org.example.exeptions.StorageException;
+import org.example.feignclient.JSONPlaceHolderClientEvent;
+import org.example.feignclient.JSONPlaceHolderClientUser;
 import org.example.mapper.TaskListMapper;
 import org.example.mapper.TaskMapper;
 
 import org.example.model.Task;
 import org.example.repository.TaskRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -31,9 +36,20 @@ public class TaskServiceImpl implements TaskService {
     private final TaskMapper mapper;
     private final TaskListMapper listMapper;
 
+    @Autowired
+    private JSONPlaceHolderClientEvent clientEvent;
+
+    @Autowired
+    private JSONPlaceHolderClientUser clientUser;
+
 
     @Override
     public TaskDto createTask(NewTaskDto newTask) {
+        try {
+            var eventDto = getClientEvent().getEventById(newTask.getAuthorId(), newTask.getEventId());
+        } catch (Exception e) {
+            throw new StorageException("Событие с id = " + newTask.getEventId() + " не найдено");
+        }
         LocalDateTime time = LocalDateTime.now();
         Task task = Task.builder()
                 .title(newTask.getTitle())
@@ -50,6 +66,11 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskDto updateTask(Long userId, Long id, UpdateTaskDto updateTask) {
+        try {
+            var eventDto = getClientEvent().getEventById(userId, updateTask.getEventId());
+        } catch (Exception e) {
+            throw new StorageException("Событие с id = " + updateTask.getEventId() + " не найдено");
+        }
         Task task = taskRepository.findById(id).orElseThrow(() -> new StorageException("Событие не найдено или недоступно"));
         if ((userId != task.getAuthorId()) && userId != task.getAssigneeId()){
             throw new ConflictException("Нет прав на изменение задачи");
@@ -70,6 +91,11 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<TaskDto> getTasks(int page, int size, Long eventId, Long assigneeId, Long authorId) {
+        try {
+            var eventDto = getClientEvent().getEventById(1L, eventId);
+        } catch (Exception e) {
+            throw new StorageException("Событие с id = " + eventId + " не найдено");
+        }
         Pageable paged = PageRequest.of(page, size);
         Page<Task> tasks = taskRepository.findByFilters(assigneeId, eventId, authorId,paged);
         if(tasks.isEmpty()){
