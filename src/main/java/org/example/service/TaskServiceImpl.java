@@ -92,7 +92,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<TaskDto> getTasks(int page, int size, Long eventId, Long assigneeId, Long authorId) {
         try {
-            var eventDto = getClientEvent().getEventById(authorId, eventId);
+            var eventDto = getClientEvent().getEventById(1L, eventId);
         } catch (Exception e) {
             throw new StorageException("Событие с id = " + eventId + " не найдено");
         }
